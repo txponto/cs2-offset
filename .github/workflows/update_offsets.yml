@@ -28,7 +28,7 @@ jobs:
     - name: Run Python Script
       id: run-python-script
       run: |
-        python ./offsets/update_offsets.py
+        python ./offsets/offset_updater.py
         echo "exit_code=$?" >> $GITHUB_OUTPUT
       continue-on-error: true
 
