@@ -52,7 +52,7 @@ jobs:
       uses: peter-evans/create-pull-request@v5
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        commit-message: Automatically updated offsets from a2x/cs2-dumper
+        commit-message: Automatically updated offsets
         author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
         signoff: false
         branch: offset-update
@@ -60,7 +60,7 @@ jobs:
         title: 'Automatically updated offsets'
         body: |
           Offsets Updated
-           - Automatically updated offsets from [cs2-dumper](https://github.com/a2x/cs2-dumper)
+           - Automatically updated offsets
         labels: |
           update-offsets
         reviewers: txponto
