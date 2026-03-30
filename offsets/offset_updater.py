@@ -115,6 +115,11 @@ try:
     offsets_json["m_szName"] = client_json_base["CCSWeaponBaseVData"]["fields"]["m_szName"]
     offsets_json["m_vOldOrigin"] = client_json_base["C_BasePlayerPawn"]["fields"]["m_vOldOrigin"]
     offsets_json["m_vecAbsOrigin"] = client_json_base["CGameSceneNode"]["fields"]["m_vecAbsOrigin"]
+    
+    # Spectator offsets
+    offsets_json["m_pObserverServices"] = client_json_base["C_BasePlayerPawn"]["fields"]["m_pObserverServices"]
+    offsets_json["m_iObserverMode"] = client_json_base["CPlayer_ObserverServices"]["fields"]["m_iObserverMode"]
+    offsets_json["m_hObserverTarget"] = client_json_base["CPlayer_ObserverServices"]["fields"]["m_hObserverTarget"]
 except KeyError as e:
     print(f"KeyError (#2): {e}")
     print("The structure of the remote client_dll.json has changed. Please check the repository for updates.")
@@ -124,3 +129,4 @@ with open(dest_path, 'w') as dest_file:
     json.dump(offsets_json, dest_file, indent=4)
 
 print("Offsets updated in the local file.") 
+
