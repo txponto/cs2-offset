@@ -1,5 +1,5 @@
 {
-    "build_number": 14101,
+    "build_number": 14141,
     "dwBuildNumber": 6350100,
     "dwEntityList": 38470232,
     "dwLocalPlayer": 33991136,
@@ -24,5 +24,8 @@
     "m_vecAbsOrigin": 208,
     "dwLocalPlayerController": 36655144,
     "m_hController": 5536,
-    "m_iszPlayerName": 1784
+    "m_iszPlayerName": 1784,
+    "m_pObserverServices": 5104,
+    "m_iObserverMode": 72,
+    "m_hObserverTarget": 76
 }
