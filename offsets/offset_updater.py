@@ -8,66 +8,43 @@ urls = {
     "client_dll": "https://github.com/a2x/cs2-dumper/raw/refs/heads/main/output/client_dll.json",
 }
 
+
 def get_build_number():
-    response = requests.get(urls["info"])
-    if response.status_code == 200:
-        game_info = response.json()
-        if game_info:
-            version = game_info['build_number']
-            return int(version)
-    return 0
+    response = requests.get(urls["info"], timeout=15)
+    response.raise_for_status()
+    game_info = response.json()
+    return int(game_info.get("build_number", 0))
+
 
 def get_raw_file(url):
-    response = requests.get(url)
-    if response.status_code == 200:
-        return response.json()
-    return None
+    response = requests.get(url, timeout=15)
+    response.raise_for_status()
+    return response.json()
+
 
 def get_path():
     if os.path.isfile("./offsets/offsets.json"):
         return "./offsets/offsets.json"
     elif os.path.isfile("./offsets.json"):
         return "./offsets.json"
-    else:
-        return None
+    return None
 
-dest_path = get_path()
 
-if not dest_path:
-    print("Invalid path for 'offsets.json'")
-    exit(1)
+def load_local_offsets(path):
+    with open(path, "r", encoding="utf-8") as dest_file:
+        return json.load(dest_file)
 
-build_number = get_build_number()
 
-if build_number == 0:
-    print("Could not find the latest build number.")
-    exit(1)
+def save_local_offsets(path, data):
+    with open(path, "w", encoding="utf-8") as dest_file:
+        json.dump(data, dest_file, indent=4)
+        dest_file.write("\n")
 
-offsets = get_raw_file(urls["offsets"])
 
-if not offsets:
-    print("Could not find the latest offsets.")
-    exit(1)
+def build_updated_offsets(offsets_json, build_number, offsets, client):
+    client_json_base = client["client.dll"]["classes"]
 
-with open(dest_path, 'r') as dest_file:
-    offsets_json = json.load(dest_file)
-
-print(f"Current build number: {offsets_json['build_number']} vs Latest build number: {build_number}")
-
-if offsets_json["build_number"] == int(build_number):
-    print(f"There are no updates in the remote repository after {build_number}.")
-    print("Comparing the offsets in the local offsets (dwLocalPlayer/dwViewMatrix) with the remote repository.")
-
-    valid = offsets_json["dwLocalPlayer"] == offsets["client.dll"]["dwLocalPlayerPawn"] and \
-                offsets_json["dwViewMatrix"] == offsets["client.dll"]["dwViewMatrix"]
-
-    if valid:
-        print("Local offsets are up to date.")
-        exit(1)
-
-    print("Local offsets (dwLocalPlayer/dwViewMatrix) are outdated, pulling the latest offsets.")
-
-try:
+    # Core offsets
     offsets_json["build_number"] = int(build_number)
 
     offsets_json["dwBuildNumber"] = offsets["engine2.dll"]["dwBuildNumber"]
@@ -76,20 +53,8 @@ try:
     offsets_json["dwEntityList"] = offsets["client.dll"]["dwEntityList"]
     offsets_json["dwViewMatrix"] = offsets["client.dll"]["dwViewMatrix"]
     offsets_json["dwPlantedC4"] = offsets["client.dll"]["dwPlantedC4"]
-except KeyError as e:
-    print(f"KeyError (#1): {e}")
-    print("The structure of the remote offsets.json has changed. Please check the repository for updates.")
-    exit(2)
 
-client = get_raw_file(urls["client_dll"])
-
-if not client:
-    print("Could not find the latest client.dll.")
-    exit(1)
-
-try:
-    client_json_base = client["client.dll"]["classes"]
-
+    # Player / entity fields
     offsets_json["m_bIsDefusing"] = client_json_base["C_CSPlayerPawn"]["fields"]["m_bIsDefusing"]
     offsets_json["m_ArmorValue"] = client_json_base["C_CSPlayerPawn"]["fields"]["m_ArmorValue"]
     offsets_json["m_pClippingWeapon"] = client_json_base["C_CSPlayerPawn"]["fields"]["m_pClippingWeapon"]
@@ -104,7 +69,7 @@ try:
     offsets_json["m_iAccount"] = client_json_base["CCSPlayerController_InGameMoneyServices"]["fields"]["m_iAccount"]
     offsets_json["m_pInGameMoneyServices"] = client_json_base["CCSPlayerController"]["fields"]["m_pInGameMoneyServices"]
 
-    offsets_json["m_sSanitizedPlayerName"] = client_json_base["CCSPlayerController"]["fields"]["m_sSanitizedPlayerName"] 
+    offsets_json["m_sSanitizedPlayerName"] = client_json_base["CCSPlayerController"]["fields"]["m_sSanitizedPlayerName"]
     offsets_json["m_hController"] = client_json_base["C_BasePlayerPawn"]["fields"]["m_hController"]
     offsets_json["m_iszPlayerName"] = client_json_base["CBasePlayerController"]["fields"]["m_iszPlayerName"]
 
@@ -115,18 +80,69 @@ try:
     offsets_json["m_szName"] = client_json_base["CCSWeaponBaseVData"]["fields"]["m_szName"]
     offsets_json["m_vOldOrigin"] = client_json_base["C_BasePlayerPawn"]["fields"]["m_vOldOrigin"]
     offsets_json["m_vecAbsOrigin"] = client_json_base["CGameSceneNode"]["fields"]["m_vecAbsOrigin"]
-    
+
     # Spectator offsets
     offsets_json["m_pObserverServices"] = client_json_base["C_BasePlayerPawn"]["fields"]["m_pObserverServices"]
     offsets_json["m_iObserverMode"] = client_json_base["CPlayer_ObserverServices"]["fields"]["m_iObserverMode"]
     offsets_json["m_hObserverTarget"] = client_json_base["CPlayer_ObserverServices"]["fields"]["m_hObserverTarget"]
-except KeyError as e:
-    print(f"KeyError (#2): {e}")
-    print("The structure of the remote client_dll.json has changed. Please check the repository for updates.")
-    exit(2)
 
-with open(dest_path, 'w') as dest_file:
-    json.dump(offsets_json, dest_file, indent=4)
+    return offsets_json
 
-print("Offsets updated in the local file.") 
 
+def main():
+    dest_path = get_path()
+
+    if not dest_path:
+        print("Invalid path for 'offsets.json'")
+        raise SystemExit(1)
+
+    try:
+        build_number = get_build_number()
+        if build_number == 0:
+            print("Could not find the latest build number.")
+            raise SystemExit(1)
+
+        offsets = get_raw_file(urls["offsets"])
+        if not offsets:
+            print("Could not find the latest offsets.")
+            raise SystemExit(1)
+
+        client = get_raw_file(urls["client_dll"])
+        if not client:
+            print("Could not find the latest client.dll.")
+            raise SystemExit(1)
+
+        offsets_json = load_local_offsets(dest_path)
+
+        current_build = int(offsets_json.get("build_number", 0))
+        print(f"Current build number: {current_build} vs Latest build number: {build_number}")
+
+        # Always rebuild the local JSON so new keys like spectator offsets
+        # are added even when the build number did not change.
+        updated_offsets = build_updated_offsets(offsets_json, build_number, offsets, client)
+
+        if current_build == build_number:
+            print("Build number is unchanged, but refreshing all tracked offsets anyway.")
+        else:
+            print("Build number changed, updating local offsets.")
+
+        save_local_offsets(dest_path, updated_offsets)
+        print("Offsets updated in the local file.")
+
+    except requests.RequestException as e:
+        print(f"Network error: {e}")
+        raise SystemExit(1)
+    except KeyError as e:
+        print(f"KeyError: {e}")
+        print("The structure of the remote JSON appears to have changed. Check the source repository.")
+        raise SystemExit(2)
+    except json.JSONDecodeError as e:
+        print(f"JSON decode error: {e}")
+        raise SystemExit(1)
+    except OSError as e:
+        print(f"File error: {e}")
+        raise SystemExit(1)
+
+
+if __name__ == "__main__":
+    main()
