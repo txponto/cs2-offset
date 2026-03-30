@@ -53,6 +53,7 @@ def build_updated_offsets(offsets_json, build_number, offsets, client):
     offsets_json["dwEntityList"] = offsets["client.dll"]["dwEntityList"]
     offsets_json["dwViewMatrix"] = offsets["client.dll"]["dwViewMatrix"]
     offsets_json["dwPlantedC4"] = offsets["client.dll"]["dwPlantedC4"]
+    offsets_json["dwGameRules"] = offsets["client.dll"]["dwGameRules"]
 
     # Player / entity fields
     offsets_json["m_bIsDefusing"] = client_json_base["C_CSPlayerPawn"]["fields"]["m_bIsDefusing"]
@@ -66,6 +67,8 @@ def build_updated_offsets(offsets_json, build_number, offsets, client):
     offsets_json["m_flTimerLength"] = client_json_base["C_PlantedC4"]["fields"]["m_flTimerLength"]
 
     offsets_json["m_hPlayerPawn"] = client_json_base["CCSPlayerController"]["fields"]["m_hPlayerPawn"]
+    offsets_json["m_hObserverPawn"] = client_json_base["CCSPlayerController"]["fields"]["m_hObserverPawn"]
+    offsets_json["m_bPawnIsAlive"] = client_json_base["CCSPlayerController"]["fields"]["m_bPawnIsAlive"]
     offsets_json["m_iAccount"] = client_json_base["CCSPlayerController_InGameMoneyServices"]["fields"]["m_iAccount"]
     offsets_json["m_pInGameMoneyServices"] = client_json_base["CCSPlayerController"]["fields"]["m_pInGameMoneyServices"]
 
@@ -85,6 +88,10 @@ def build_updated_offsets(offsets_json, build_number, offsets, client):
     offsets_json["m_pObserverServices"] = client_json_base["C_BasePlayerPawn"]["fields"]["m_pObserverServices"]
     offsets_json["m_iObserverMode"] = client_json_base["CPlayer_ObserverServices"]["fields"]["m_iObserverMode"]
     offsets_json["m_hObserverTarget"] = client_json_base["CPlayer_ObserverServices"]["fields"]["m_hObserverTarget"]
+
+    # Game rules offsets
+    offsets_json["m_pGameRules"] = client_json_base["C_CSGameRulesProxy"]["fields"]["m_pGameRules"]
+    offsets_json["m_nRoundStartCount"] = client_json_base["C_CSGameRules"]["fields"]["m_nRoundStartCount"]
 
     return offsets_json
 
@@ -117,8 +124,8 @@ def main():
         current_build = int(offsets_json.get("build_number", 0))
         print(f"Current build number: {current_build} vs Latest build number: {build_number}")
 
-        # Always rebuild the local JSON so new keys like spectator offsets
-        # are added even when the build number did not change.
+        # Always rebuild the local JSON so new keys are added even when
+        # the build number did not change.
         updated_offsets = build_updated_offsets(offsets_json, build_number, offsets, client)
 
         if current_build == build_number:
