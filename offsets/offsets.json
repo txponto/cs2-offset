@@ -27,5 +27,10 @@
     "m_iszPlayerName": 1784,
     "m_pObserverServices": 5104,
     "m_iObserverMode": 72,
-    "m_hObserverTarget": 76
+    "m_hObserverTarget": 76,
+    "dwGameRules": 36761296,
+    "m_hObserverPawn": 2320,
+    "m_bPawnIsAlive": 2324,
+    "m_pGameRules": 1544,
+    "m_nRoundStartCount": 3916
 }
