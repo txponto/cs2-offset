@@ -1,8 +1,8 @@
 {
     "unsafe": false,
-    "notice": "Private Build CS2-Minimal-ESP",
+    "notice": "CS2-ESP.xyz",
     "version": {
-        "current": 101,
-        "minimum": 101
+        "current": 102,
+        "minimum": 102
     }
 }
