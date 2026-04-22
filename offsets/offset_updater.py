@@ -58,7 +58,8 @@ def build_updated_offsets(offsets_json, build_number, offsets, client):
     # Player / entity fields
     offsets_json["m_bIsDefusing"] = client_json_base["C_CSPlayerPawn"]["fields"]["m_bIsDefusing"]
     offsets_json["m_ArmorValue"] = client_json_base["C_CSPlayerPawn"]["fields"]["m_ArmorValue"]
-    offsets_json["m_pClippingWeapon"] = client_json_base["C_CSPlayerPawn"]["fields"]["m_pClippingWeapon"]
+    offsets_json["m_pWeaponServices"] = client_json_base["C_BasePlayerPawn"]["fields"]["m_pWeaponServices"]
+    offsets_json["m_hActiveWeapon"] = client_json_base["CPlayer_WeaponServices"]["fields"]["m_hActiveWeapon"]
 
     offsets_json["m_flFlashOverlayAlpha"] = client_json_base["C_CSPlayerPawnBase"]["fields"]["m_flFlashOverlayAlpha"]
 
