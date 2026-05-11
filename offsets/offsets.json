@@ -33,5 +33,6 @@
     "m_iObserverMode": 72,
     "m_hObserverTarget": 76,
     "m_pGameRules": 1536,
-    "m_nRoundStartCount": 3916
+    "m_nRoundStartCount": 3916,
+    "m_bIsScoped": 7248
 }
