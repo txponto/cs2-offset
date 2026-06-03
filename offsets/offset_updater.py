@@ -74,6 +74,8 @@ def build_updated_offsets(offsets_json, build_number, offsets, client):
     # Core offsets
     offsets_json["build_number"] = int(build_number)
 
+    offsets_json["dwCSGOInput"] = offsets["client.dll"]["dwCSGOInput"]
+    offsets_json["dwViewAngles"] = offsets["client.dll"]["dwViewAngles"]
     offsets_json["dwBuildNumber"] = offsets["engine2.dll"]["dwBuildNumber"]
     offsets_json["dwLocalPlayer"] = offsets["client.dll"]["dwLocalPlayerPawn"]
     offsets_json["dwLocalPlayerController"] = offsets["client.dll"]["dwLocalPlayerController"]
@@ -205,6 +207,15 @@ def build_updated_offsets(offsets_json, build_number, offsets, client):
     sf("m_flZoomTime2", "CCSWeaponBaseVData", "m_flZoomTime2", required=False)
     sf("m_flIronSightFOV", "CCSWeaponBaseVData", "m_flIronSightFOV", required=False)
 
+    # View / aim direction
+    sf("m_angEyeAngles", "C_CSPlayerPawn", "m_angEyeAngles")
+    sf("m_angEyeAnglesVelocity", "C_CSPlayerPawn", "m_angEyeAnglesVelocity", required=False)
+    sf("m_arrOldEyeAngles", "C_CSPlayerPawn", "m_arrOldEyeAngles", required=False)
+    sf("m_arrOldEyeAnglesTimes", "C_CSPlayerPawn", "m_arrOldEyeAnglesTimes", required=False)
+    sf("m_angStashedShootAngles", "C_CSPlayerPawn", "m_angStashedShootAngles", required=False)
+
+    # Recoil / aim punch service pointer
+    sf("m_pAimPunchServices", "C_CSPlayerPawn", "m_pAimPunchServices", required=False)
     
     return offsets_json
 
