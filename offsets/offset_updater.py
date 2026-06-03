@@ -30,6 +30,13 @@ def get_path():
     return None
 
 
+def get_field(classes, class_name, field_name):
+    try:
+        return classes[class_name]["fields"][field_name]
+    except KeyError as exc:
+        raise KeyError(f"Missing schema field: {class_name}.{field_name}") from exc
+    
+
 def load_local_offsets(path):
     with open(path, "r", encoding="utf-8") as dest_file:
         return json.load(dest_file)
@@ -95,6 +102,80 @@ def build_updated_offsets(offsets_json, build_number, offsets, client):
     offsets_json["m_pGameRules"] = client_json_base["C_CSGameRulesProxy"]["fields"]["m_pGameRules"]
     offsets_json["m_nRoundStartCount"] = client_json_base["C_CSGameRules"]["fields"]["m_nRoundStartCount"]
 
+    # Helpers
+    f = lambda class_name, field_name: get_field(client_json_base, class_name, field_name)
+
+    # ------------------------------------------------------------------
+    # Player loadout / current weapons
+    # ------------------------------------------------------------------
+    # Pawn -> weapon services -> current carried weapon handles.
+    offsets_json["m_pWeaponServices"] = f("C_BasePlayerPawn", "m_pWeaponServices")
+    offsets_json["m_hMyWeapons"] = f("CPlayer_WeaponServices", "m_hMyWeapons")
+    offsets_json["m_hActiveWeapon"] = f("CPlayer_WeaponServices", "m_hActiveWeapon")
+    offsets_json["m_hLastWeapon"] = f("CPlayer_WeaponServices", "m_hLastWeapon")
+    offsets_json["m_iAmmo"] = f("CPlayer_WeaponServices", "m_iAmmo")
+
+    # Weapon entity ammo / clip info.
+    offsets_json["m_iClip1"] = f("C_BasePlayerWeapon", "m_iClip1")
+    offsets_json["m_iClip2"] = f("C_BasePlayerWeapon", "m_iClip2")
+    offsets_json["m_pReserveAmmo"] = f("C_BasePlayerWeapon", "m_pReserveAmmo")
+
+    # Econ item identity for resolving weapon/loadout item definitions.
+    offsets_json["m_AttributeManager"] = f("C_EconEntity", "m_AttributeManager")
+    offsets_json["m_Item"] = f("C_AttributeContainer", "m_Item")
+    offsets_json["m_iItemDefinitionIndex"] = f("C_EconItemView", "m_iItemDefinitionIndex")
+
+    # Controller-side networked loadout.
+    offsets_json["m_pInventoryServices"] = f("CCSPlayerController", "m_pInventoryServices")
+    offsets_json["m_vecNetworkableLoadout"] = f(
+        "CCSPlayerController_InventoryServices",
+        "m_vecNetworkableLoadout",
+    )
+    offsets_json["m_vecServerAuthoritativeWeaponSlots"] = f(
+        "CCSPlayerController_InventoryServices",
+        "m_vecServerAuthoritativeWeaponSlots",
+    )
+
+    # Fields inside CCSPlayerController_InventoryServices::NetworkedLoadoutSlot_t
+    offsets_json["NetworkedLoadoutSlot_pItem"] = f(
+        "CCSPlayerController_InventoryServices::NetworkedLoadoutSlot_t",
+        "pItem",
+    )
+    offsets_json["NetworkedLoadoutSlot_team"] = f(
+        "CCSPlayerController_InventoryServices::NetworkedLoadoutSlot_t",
+        "team",
+    )
+    offsets_json["NetworkedLoadoutSlot_slot"] = f(
+        "CCSPlayerController_InventoryServices::NetworkedLoadoutSlot_t",
+        "slot",
+    )
+
+    # ------------------------------------------------------------------
+    # FOV / camera services
+    # ------------------------------------------------------------------
+    # Pawn -> camera services -> current FOV values.
+    offsets_json["m_pCameraServices"] = f("C_BasePlayerPawn", "m_pCameraServices")
+    offsets_json["m_iFOV"] = f("CCSPlayerBase_CameraServices", "m_iFOV")
+    offsets_json["m_iFOVStart"] = f("CCSPlayerBase_CameraServices", "m_iFOVStart")
+    offsets_json["m_flFOVTime"] = f("CCSPlayerBase_CameraServices", "m_flFOVTime")
+    offsets_json["m_flFOVRate"] = f("CCSPlayerBase_CameraServices", "m_flFOVRate")
+    offsets_json["m_hZoomOwner"] = f("CCSPlayerBase_CameraServices", "m_hZoomOwner")
+    offsets_json["m_flLastShotFOV"] = f("CCSPlayerBase_CameraServices", "m_flLastShotFOV")
+
+    # Optional but useful FOV/sensitivity-related pawn values.
+    offsets_json["m_flFOVSensitivityAdjust"] = f("C_BasePlayerPawn", "m_flFOVSensitivityAdjust")
+    offsets_json["m_flMouseSensitivity"] = f("C_BasePlayerPawn", "m_flMouseSensitivity")
+
+    # Weapon VData FOV/zoom characteristics.
+    offsets_json["m_nZoomLevels"] = f("CCSWeaponBaseVData", "m_nZoomLevels")
+    offsets_json["m_nZoomFOV1"] = f("CCSWeaponBaseVData", "m_nZoomFOV1")
+    offsets_json["m_nZoomFOV2"] = f("CCSWeaponBaseVData", "m_nZoomFOV2")
+    offsets_json["m_flZoomTime0"] = f("CCSWeaponBaseVData", "m_flZoomTime0")
+    offsets_json["m_flZoomTime1"] = f("CCSWeaponBaseVData", "m_flZoomTime1")
+    offsets_json["m_flZoomTime2"] = f("CCSWeaponBaseVData", "m_flZoomTime2")
+    offsets_json["m_flIronSightFOV"] = f("CCSWeaponBaseVData", "m_flIronSightFOV")
+
+    
     return offsets_json
 
 
