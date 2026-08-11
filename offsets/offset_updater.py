@@ -77,18 +77,28 @@ def build_updated_offsets(offsets_json, build_number, offsets, client):
     offsets_json["dwCSGOInput"] = offsets["client.dll"]["dwCSGOInput"]
     offsets_json["dwViewAngles"] = offsets["client.dll"]["dwViewAngles"]
     offsets_json["dwBuildNumber"] = offsets["engine2.dll"]["dwBuildNumber"]
+    # Keep the legacy key for consumers that still expect it, while also
+    # writing the exact name used by the C++ usermode project.
     offsets_json["dwLocalPlayer"] = offsets["client.dll"]["dwLocalPlayerPawn"]
+    offsets_json["dwLocalPlayerPawn"] = offsets["client.dll"]["dwLocalPlayerPawn"]
     offsets_json["dwLocalPlayerController"] = offsets["client.dll"]["dwLocalPlayerController"]
     offsets_json["dwEntityList"] = offsets["client.dll"]["dwEntityList"]
+    offsets_json["dwGameEntitySystem_highestEntityIndex"] = offsets["client.dll"]["dwGameEntitySystem_highestEntityIndex"]
     offsets_json["dwViewMatrix"] = offsets["client.dll"]["dwViewMatrix"]
     offsets_json["dwPlantedC4"] = offsets["client.dll"]["dwPlantedC4"]
+    offsets_json["dwGlobalVars"] = offsets["client.dll"]["dwGlobalVars"]
+    offsets_json["dwWeaponC4"] = offsets["client.dll"]["dwWeaponC4"]
     offsets_json["dwGameRules"] = offsets["client.dll"]["dwGameRules"]
+    offsets_json["dwGameTypes"] = offsets["matchmaking.dll"]["dwGameTypes"]
 
     # Player / entity fields
     offsets_json["m_bIsDefusing"] = client_json_base["C_CSPlayerPawn"]["fields"]["m_bIsDefusing"]
     offsets_json["m_ArmorValue"] = client_json_base["C_CSPlayerPawn"]["fields"]["m_ArmorValue"]
     offsets_json["m_pWeaponServices"] = client_json_base["C_BasePlayerPawn"]["fields"]["m_pWeaponServices"]
+    offsets_json["m_pItemServices"] = client_json_base["C_BasePlayerPawn"]["fields"]["m_pItemServices"]
     offsets_json["m_hActiveWeapon"] = client_json_base["CPlayer_WeaponServices"]["fields"]["m_hActiveWeapon"]
+    offsets_json["m_bHasDefuser"] = client_json_base["CCSPlayer_ItemServices"]["fields"]["m_bHasDefuser"]
+    offsets_json["m_bHasHelmet"] = client_json_base["CCSPlayer_ItemServices"]["fields"]["m_bHasHelmet"]
     offsets_json["m_bIsScoped"] = client_json_base["C_CSPlayerPawn"]["fields"]["m_bIsScoped"]
 
     offsets_json["m_flFlashOverlayAlpha"] = client_json_base["C_CSPlayerPawnBase"]["fields"]["m_flFlashOverlayAlpha"]
@@ -96,8 +106,18 @@ def build_updated_offsets(offsets_json, build_number, offsets, client):
     offsets_json["m_flC4Blow"] = client_json_base["C_PlantedC4"]["fields"]["m_flC4Blow"]
     offsets_json["m_flNextBeep"] = client_json_base["C_PlantedC4"]["fields"]["m_flNextBeep"]
     offsets_json["m_flTimerLength"] = client_json_base["C_PlantedC4"]["fields"]["m_flTimerLength"]
+    offsets_json["m_bBombTicking"] = client_json_base["C_PlantedC4"]["fields"]["m_bBombTicking"]
+    offsets_json["m_bBeingDefused"] = client_json_base["C_PlantedC4"]["fields"]["m_bBeingDefused"]
+    offsets_json["m_bBombDefused"] = client_json_base["C_PlantedC4"]["fields"]["m_bBombDefused"]
+    offsets_json["m_flDefuseCountDown"] = client_json_base["C_PlantedC4"]["fields"]["m_flDefuseCountDown"]
 
+    offsets_json["m_hPawn"] = client_json_base["CBasePlayerController"]["fields"]["m_hPawn"]
+    offsets_json["m_bIsLocalPlayerController"] = client_json_base["CBasePlayerController"]["fields"]["m_bIsLocalPlayerController"]
+    offsets_json["m_steamID"] = client_json_base["CBasePlayerController"]["fields"]["m_steamID"]
     offsets_json["m_hPlayerPawn"] = client_json_base["CCSPlayerController"]["fields"]["m_hPlayerPawn"]
+    offsets_json["m_iPing"] = client_json_base["CCSPlayerController"]["fields"]["m_iPing"]
+    offsets_json["m_iPawnHealth"] = client_json_base["CCSPlayerController"]["fields"]["m_iPawnHealth"]
+    offsets_json["m_iPawnArmor"] = client_json_base["CCSPlayerController"]["fields"]["m_iPawnArmor"]
     offsets_json["m_hObserverPawn"] = client_json_base["CCSPlayerController"]["fields"]["m_hObserverPawn"]
     offsets_json["m_bPawnIsAlive"] = client_json_base["CCSPlayerController"]["fields"]["m_bPawnIsAlive"]
     offsets_json["m_iAccount"] = client_json_base["CCSPlayerController_InGameMoneyServices"]["fields"]["m_iAccount"]
@@ -109,11 +129,39 @@ def build_updated_offsets(offsets_json, build_number, offsets, client):
 
     offsets_json["m_iHealth"] = client_json_base["C_BaseEntity"]["fields"]["m_iHealth"]
     offsets_json["m_iTeamNum"] = client_json_base["C_BaseEntity"]["fields"]["m_iTeamNum"]
+    offsets_json["m_hOwnerEntity"] = client_json_base["C_BaseEntity"]["fields"]["m_hOwnerEntity"]
     offsets_json["m_pGameSceneNode"] = client_json_base["C_BaseEntity"]["fields"]["m_pGameSceneNode"]
 
     offsets_json["m_szName"] = client_json_base["CCSWeaponBaseVData"]["fields"]["m_szName"]
+    offsets_json["m_WeaponType"] = client_json_base["CCSWeaponBaseVData"]["fields"]["m_WeaponType"]
     offsets_json["m_vOldOrigin"] = client_json_base["C_BasePlayerPawn"]["fields"]["m_vOldOrigin"]
     offsets_json["m_vecAbsOrigin"] = client_json_base["CGameSceneNode"]["fields"]["m_vecAbsOrigin"]
+    offsets_json["m_bDormant"] = client_json_base["CGameSceneNode"]["fields"]["m_bDormant"]
+    offsets_json["m_modelState"] = client_json_base["CSkeletonInstance"]["fields"]["m_modelState"]
+    offsets_json["m_entitySpottedState"] = client_json_base["C_CSPlayerPawn"]["fields"]["m_entitySpottedState"]
+    offsets_json["m_bSpottedByMask"] = client_json_base["EntitySpottedState_t"]["fields"]["m_bSpottedByMask"]
+
+    # Bomb fields used by the external ESP.
+    offsets_json["m_nBombSite"] = client_json_base["C_PlantedC4"]["fields"]["m_nBombSite"]
+    offsets_json["m_bC4Activated"] = client_json_base["C_PlantedC4"]["fields"]["m_bC4Activated"]
+
+    # Layout values not currently exported as schema fields by cs2-dumper.
+    offsets_json["m_isPlanted"] = 0x8
+    offsets_json["global_maxClients"] = 0x10
+    offsets_json["global_currentTime"] = 0x30
+    offsets_json["global_currentMapName"] = 0x188
+    offsets_json["gameTypes_mapName"] = 0x120
+
+    # Entity identity fields used while walking the entity system.
+    offsets_json["CEntityInstance_m_pEntity"] = client_json_base["CEntityInstance"]["fields"]["m_pEntity"]
+    offsets_json["CEntityIdentity_m_designerName"] = client_json_base["CEntityIdentity"]["fields"]["m_designerName"]
+    offsets_json["CEntityIdentity_m_flags"] = client_json_base["CEntityIdentity"]["fields"]["m_flags"]
+
+    # cs2-dumper does not currently expose the weapon VData pointer field.
+    # Preserve a manually maintained value, or initialize the known fallback.
+    if "m_WeaponData" not in offsets_json:
+        print("Warning: m_WeaponData is not exported by cs2-dumper; using fallback 0x388.")
+        offsets_json["m_WeaponData"] = 0x388
 
     # Spectator offsets
     offsets_json["m_pObserverServices"] = client_json_base["C_BasePlayerPawn"]["fields"]["m_pObserverServices"]
