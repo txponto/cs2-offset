@@ -1,4 +1,4 @@
-# CS2-ESP Offsets and Web Radar Asset Backup
+# CS2-ESP.XYZ Offsets and Web Radar Asset Backup
 
 This repository supports [CS2-ESP](https://cs2-esp.xyz/) by providing the offset data and backup assets used by its desktop overlay and browser-based radar.
 
